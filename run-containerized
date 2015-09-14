@@ -8,6 +8,7 @@
 # run-containerized 'bin/ci'
 # run-containerized 'mvn clean install'
 set -o pipefail
+set -e
 trap cleanupContainer EXIT
 
 function cleanupContainer() {
