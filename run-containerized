@@ -45,7 +45,7 @@ BUILD_CACHE_DIR="$CACHE_DIR/$JOB_NAME"
 
 # Projects that want to use this setup should maintain a Dockerfile in dockerfiles/ci
 # that describes the required build environment.
-DOCKER_CONTEXT_DIR=${DOCKER_CONTEXT_DIR:-$WORKSPACE/dockerfiles/ci}
+DOCKER_CONTEXT_DIR="${DOCKER_CONTEXT_DIR:-$WORKSPACE/dockerfiles/ci}"
 
 if [ ! -d "$DOCKER_CONTEXT_DIR" ]; then
   abort "No Dockerfile found at $DOCKER_CONTEXT_DIR"
@@ -83,26 +83,28 @@ DOCKER_IMG=$(echo "$BUILD" | tail -n 1 | rev | cut -d ' ' -f1 | rev)
 # Note that containers are run detached because due to how the Docker CLI works it's
 # not trivial to cleanup the Docker container when the Jenkins job get's aborted if
 # containers are run in the foreground.
-set -x
-CID=$(docker run -it -d -v $WORKSPACE:/workspace \
+CID=$(set -x
+      docker run -it -d -v $WORKSPACE:/workspace \
                         -v $BUILD_CACHE_DIR:/cache \
                         -w /workspace \
                         -e 'CI=true' \
                         $DOCKER_OPTS $DOCKER_IMG \
                         bash -c "INIT=/usr/local/bin/init-container ;\
                         [ -e \$INIT ] && \$INIT ;\
-                        $@ ;\
-                        JOB_RESULT=\$? ; chown -R $(id -u `whoami`) /workspace ;\
-                        (exit \$JOB_RESULT)")
-set +x
+                        $* ;\
+                        JOB_RESULT=\$? ; chown -R $(id -u) /workspace ;\
+                        exit \$JOB_RESULT")
 
 # This is used for debugging. If you run this script locally while setting up or
 # debugging your CI build environment you could pass 'bash' as CI command and get
 # an interactive environment.
-[[ "$@" = "bash" ]] && docker attach $CID
+if [ "$1" = "bash" ]; then
+  docker attach $CID
+fi
 
 # Tail the logs of the container so we can see the build output
 docker logs -f $CID &
 
 # Wait for the container to exit when the CI command is done.
 exit $(docker wait $CID)
+
