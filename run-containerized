@@ -18,10 +18,17 @@ function cleanupContainer() {
   fi
 }
 
+RED="$(tput setaf 1)"
+NORMAL="$(tput sgr 0)"
+
 function abort() {
-  echo "$(tput setaf 1)$1$(tput sgr 0)"
+  echo "${RED}ERROR: $1${NORMAL}" >&2
   exit 1
 }
+
+# check environment (jenkins standard envvars)
+[ -n "$JOB_NAME" ]  || abort "envvar \$JOB_NAME not initialized"
+[ -n "$WORKSPACE" ] || abort "envvar \$WORKSPACE not initialized"
 
 # Forward the SSH agent to the Docker container, useful in combination with
 # https://wiki.jenkins-ci.org/display/JENKINS/SSH+Agent+Plugin
