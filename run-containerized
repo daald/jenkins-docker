@@ -40,8 +40,16 @@ fi
 # a /cache directory that's unique to the job and can be used to store any build
 # artifacts that should persist across builds. Think about Ruby gems, the local
 # Java Maven repository etc.
-CACHE_DIR=${CACHE_DIR:-/ci/cache}
+if [ -n "$CACHE_DIR" ]; then
+  [ -d "$CACHE_DIR" ] || abort "\$CACHE_DIR $CACHE_DIR doesn't exist"
+elif [ -d "/ci/cache" ]; then
+  CACHE_DIR=/ci/cache
+else
+  CACHE_DIR=~/.ci-cache
+  mkdir -p "$CACHE_DIR"
+fi
 BUILD_CACHE_DIR="$CACHE_DIR/$JOB_NAME"
+[ -d "$BUILD_CACHE_DIR" ] || mkdir "$BUILD_CACHE_DIR"
 
 # Projects that want to use this setup should maintain a Dockerfile in dockerfiles/ci
 # that describes the required build environment.
