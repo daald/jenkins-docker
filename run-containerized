@@ -32,8 +32,8 @@ function abort() {
 
 # Forward the SSH agent to the Docker container, useful in combination with
 # https://wiki.jenkins-ci.org/display/JENKINS/SSH+Agent+Plugin
-if [[ -n $SSH_AUTH_SOCK ]]; then
-  DOCKER_OPTS="$DOCKER_OPTS -v $SSH_AUTH_SOCK:/tmp/auth.sock -e SSH_AUTH_SOCK=/tmp/auth.sock"
+if [ -n "$SSH_AUTH_SOCK" ]; then
+  DOCKER_OPTS="$DOCKER_OPTS -v $SSH_AUTH_SOCK:/tmp/auth.sock -e SSH_AUTH_SOCK=/tmp/auth.sock -e DISPLAY=:0"
 fi
 
 # Where to store cachable artifacts. Docker containers ran by this script get
@@ -88,7 +88,6 @@ CID=$(docker run -it -d -v $WORKSPACE:/workspace \
                         -v $BUILD_CACHE_DIR:/cache \
                         -w /workspace \
                         -e 'CI=true' \
-                        -e 'DISPLAY=:0' \
                         $DOCKER_OPTS $DOCKER_IMG \
                         bash -c "INIT=/usr/local/bin/init-container ;\
                         [ -e \$INIT ] && \$INIT ;\
