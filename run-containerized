@@ -99,7 +99,10 @@ CID=$(set -x
                         $DOCKER_OPTS $DOCKER_IMG \
                         bash -c "INIT=/usr/local/bin/init-container ;\
                         [ -e \$INIT ] && \$INIT ;\
-                        $* ;\
+                        ( \
+                          set -e ;\
+                          $* \
+                        ); \
                         JOB_RESULT=\$? ; chown -R $(id -u) /workspace ;\
                         exit \$JOB_RESULT")
 
