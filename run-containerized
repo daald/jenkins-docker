@@ -100,7 +100,7 @@ CID=$(set -x
                         bash -c "INIT=/usr/local/bin/init-container ;\
                         [ -e \$INIT ] && \$INIT ;\
                         ( \
-                          set -e ;\
+                          set -e -x ;\
                           $* \
                         ); \
                         JOB_RESULT=\$? ; chown -R $(id -u) /workspace ;\
