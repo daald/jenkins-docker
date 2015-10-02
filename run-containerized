@@ -19,6 +19,7 @@ function cleanupContainer() {
 }
 
 RED="$(tput setaf 1)"
+GREEN="$(tput setaf 2)"
 NORMAL="$(tput sgr 0)"
 
 function abort() {
@@ -123,5 +124,12 @@ fi
 docker logs -f $CID &
 
 # Wait for the container to exit when the CI command is done.
-exit $(docker wait $CID)
+exitcode=$(docker wait $CID)
+
+if [ "$exitcode" -eq 0 ]; then
+  echo "${GREEN}$0: finished successfully${NORMAL}" >&2
+else
+  echo "${RED}$0: failed with exit code $exitcode${NORMAL}" >&2
+  exit $exitcode
+fi
 
