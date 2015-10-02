@@ -30,6 +30,12 @@ function abort() {
 [ -n "$JOB_NAME" ]  || abort "envvar \$JOB_NAME not initialized"
 [ -n "$WORKSPACE" ] || abort "envvar \$WORKSPACE not initialized"
 
+# support for privileged actions
+if [ "$1" = "--privileged" ]; then
+  shift
+  DOCKER_OPTS="$DOCKER_OPTS --privileged"
+fi
+
 # Forward the SSH agent to the Docker container, useful in combination with
 # https://wiki.jenkins-ci.org/display/JENKINS/SSH+Agent+Plugin
 if [ -n "$SSH_AUTH_SOCK" ]; then
