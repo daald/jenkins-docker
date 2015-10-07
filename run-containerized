@@ -103,6 +103,7 @@ CID=$(set -x
                         -v $BUILD_CACHE_DIR:/cache \
                         -w /workspace \
                         -e 'CI=true' \
+                        -e 'WORKSPACE=/workspace' \
                         $DOCKER_OPTS $DOCKER_IMG \
                         bash -c "INIT=/usr/local/bin/init-container ;\
                         [ -e \$INIT ] && \$INIT ;\
