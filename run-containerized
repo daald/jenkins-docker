@@ -80,6 +80,7 @@ BUILD=$(docker build -t $DOCKER_TAG_NAME . | tee >(cat - >&5))
 
 # Determine the image ID we've just built
 DOCKER_IMG="${BUILD##* }"
+[ -n "$DOCKER_IMG" ] || abort "Unable to get image id"
 
 # Now actually run the Docker container.
 # We mount the jobs workspace under /workspace and a directory to store build
@@ -104,7 +105,7 @@ CID=$(set -x
                         -w /workspace \
                         -e 'CI=true' \
                         -e 'WORKSPACE=/workspace' \
-                        $DOCKER_OPTS $DOCKER_IMG \
+                        $DOCKER_OPTS "$DOCKER_IMG" \
                         bash -c "INIT=/usr/local/bin/init-container ;\
                         [ -e \$INIT ] && \$INIT ;\
                         ( \
