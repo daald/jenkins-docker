@@ -13,7 +13,7 @@ trap cleanupContainer EXIT
 
 function cleanupContainer() {
   if [ -n "$CID" ]; then
-    echo "Cleaning up docker container"
+    echo "Cleaning up docker container" >&2
     docker kill $CID > /dev/null
   fi
 }
@@ -74,7 +74,7 @@ DOCKER_TAG_NAME=$(echo $JOB_NAME | tr '[:upper:]' '[:lower:]' | sed 's/[^-a-z0-9
 # copy stdout to a new fd so we can display and capture it
 exec 5>&1
 
-echo "Building $DOCKER_TAG_NAME Docker image, this can take some..."
+echo "Building $DOCKER_TAG_NAME Docker image, this can take some time..." >&2
 BUILD=$(docker build -t $DOCKER_TAG_NAME . | tee >(cat - >&5))
 [ $? -eq 0 ] || abort "Docker image failed to build, check your Dockerfile."
 
