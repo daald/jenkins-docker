@@ -43,6 +43,16 @@ if [ -n "$SSH_AUTH_SOCK" ]; then
   DOCKER_OPTS="$DOCKER_OPTS -v $SSH_AUTH_SOCK:/tmp/auth.sock -e SSH_AUTH_SOCK=/tmp/auth.sock -e DISPLAY=:0"
 fi
 
+# allow X11 applications to use the X server
+if [ -n "$DISPLAY" ]; then
+  DOCKER_OPTS="$DOCKER_OPTS -e DISPLAY=$DISPLAY"
+  DOCKER_OPTS="$DOCKER_OPTS -v /tmp/.X11-unix:/tmp/.X11-unix"
+  if [ -n "$XAUTHORITY" ]; then
+    DOCKER_OPTS="$DOCKER_OPTS -v $XAUTHORITY:/tmp/.Xauthority"
+    DOCKER_OPTS="$DOCKER_OPTS -e XAUTHORITY=/tmp/.Xauthority"
+  fi
+fi
+
 # Where to store cachable artifacts. Docker containers ran by this script get
 # a /cache directory that's unique to the job and can be used to store any build
 # artifacts that should persist across builds. Think about Ruby gems, the local
